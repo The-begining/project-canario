@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Art Gallery</title>
+    <link rel="stylesheet" href="styles.css">
+
+    <!-- Include the Unleash Proxy Client UMD build -->
+    <script src="https://unpkg.com/unleash-proxy-client@latest/build/main.min.js" type="text/javascript"></script>
+
+    <!-- Include your JavaScript code -->
+    <script type="text/javascript">
+        // Initialize Unleash Client
+        var config = {
+            url: 'http://10.196.244.207:3000/proxy', // Unleash Proxy URL
+            clientKey: 'secret',                      // Unleash Proxy Secret
+            appName: 'art-gallery-website'            // App name for tracking
+        };
+        var unleash = new unleash.UnleashClient(config);
+        unleash.updateContext({ userId: '1233' });
+
+        const featureFlag = 'toggle_feature_flag';
+
+        unleash.on('update', () => {
+            const isFeatureEnabled = unleash.isEnabled(featureFlag);
+            const featureBanner = document.getElementById('feature-banner'); // Ensure you have this element
+
+            if (isFeatureEnabled) {
+                console.log(`${featureFlag} is enabled.`);
+                featureBanner.style.display = "none"; // Hide the banner when the feature is enabled
+            } else {
+                console.log(`${featureFlag} is disabled.`);
+                featureBanner.style.display = "show" // Show the banner when the feature is disabled
+            }
+        });
+
+        // Start the Unleash client
+        unleash.start();
+
+        // Gallery filtering functionality
+        function filterGallery(category) {
+            const artItems = document.querySelectorAll('.art-item');
+            artItems.forEach(item => {
+                if (category === 'all' || item.dataset.category === category) {
+                    item.style.display = 'block';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+        }
+
+        // Carousel setup function (if needed)
+        function setupCarousel() {
+            // Carousel setup code goes here
+        }
+
+        // Feature Flag Example for Carousel (if needed)
+        let enableCarousel = true;
+        if (enableCarousel) {
+            document.addEventListener('DOMContentLoaded', setupCarousel);
+        }
+    </script>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav>
+        <div class="logo">My Art Gallery</div>
+        <ul class="nav-links">
+            <li><a href="#home">Home</a></li>
+            <li><a href="#gallery">Gallery</a></li>
+            <li><a href="#artists">Artists</a></li>
+            <li><a href="#about">About</a></li>
+            <li><a href="#contact">Contact</a></li>
+        </ul>
+    </nav>
+
+    <!-- Hero Section -->
+    <section id="home" class="hero">
+        <div class="hero-overlay">
+            <div class="hero-content">
+                <h1>Discover Amazing Art here</h1>
+                <p>Experience the best collections from talented artists around the world.</p>
+            </div>
+        </div>
+    </section>
+    <div id="feature-banner">
+        <p>Welcome to the new feature!</p>
+    </div>
+
+    <!-- Gallery Section -->
+    <section id="gallery">
+        <h2>Artwork Gallery</h2>
+        <div class="filter-controls">
+            <button onclick="filterGallery('all')">All</button>
+            <button onclick="filterGallery('abstract')">Abstract</button>
+            <button onclick="filterGallery('portrait')">Portrait</button>
+            <button onclick="filterGallery('landscape')">Landscape</button>
+        </div>
+        <div class="gallery-grid">
+            <div class="art-item" data-category="abstract">
+                <img src="assets/images/3.jpg" alt="Abstract Art">
+                <p>Abstract Art 1</p>
+            </div>
+            <div class="art-item" data-category="portrait">
+                <img src="assets/images/OIP.jpg" alt="Portrait Art">
+                <p>Portrait Art 1</p>
+            </div>
+            <div class="art-item" data-category="landscape">
+                <img src="assets/images/1.jpg" alt="Landscape Art">
+                <p>Landscape Art 1</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact">
+        <h2>Contact Us</h2>
+        <p>Email: shsin5910@oslomet.no</p>
+    </section>
+
+    <footer>
+        <p>&copy; 2024 Art Gallery. All rights reserved.</p>
+    </footer>
+</body>
+</html>

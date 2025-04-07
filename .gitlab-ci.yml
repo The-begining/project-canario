@@ -1,0 +1,32 @@
+stages:
+  - build
+  - test
+  - deploy
+
+image_build:
+  stage: build
+  script:
+    - echo "Stage build, Dockerfile:"
+    - cat Dockerfile
+    - docker build -t webpage:$CI_PIPELINE_ID .
+
+code_test:
+  stage: test
+  script:
+    - cat index.html
+
+deploy_with_curl:
+  stage: deploy
+  script:
+    - docker run -d -P --name mywebpage-test-$CI_PIPELINE_ID webpage:$CI_PIPELINE_ID
+    - sleep 5
+    - CONTAINER_IP=$(ip addr show ens3 | grep "inet " | sed -e 's/.* inet //g' | sed -e 's/ .*//g' | sed -e 's/\/.*//g')
+    - CONTAINER_PORT=$(docker port mywebpage-test-$CI_PIPELINE_ID | grep "80/tcp" | sed -e 's/.*://g')
+    # - curl $CONTAINER_IP:$CONTAINER_PORT
+    - docker stop mywebpage-test-$CI_PIPELINE_ID
+    - docker rm mywebpage-test-$CI_PIPELINE_ID
+
+container_deploy1:
+    stage: deploy
+    script:
+    - docker service update --image webpage:$CI_PIPELINE_ID art_gallery      
